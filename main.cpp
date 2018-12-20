@@ -1,9 +1,11 @@
 #include <fstream>
 #include <limits>
 #include <vector>
+#include <random>
 
 #include "sphere.h"
 #include "hitable_list.h"
+#include "camera.h"
 
 Vec3 color(const Ray& r, Hitable* world) {
     HitRecord record;
@@ -17,41 +19,38 @@ Vec3 color(const Ray& r, Hitable* world) {
 }
 
 int main() {
+    // Prepare for random number generation
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_real_distribution<float> dis(0.0f, 1.0f);
+    
     // Screen size
     int width = 200;
     int height = 100;
+    int sampleCount = 100;
 
     // IO
     std::ofstream out_file("output.ppm");
     out_file << "P3\n" << width << " " << height << "\n255\n";
 
-    // Image plane
-    Vec3 lower_left_corner(-2.0f, -1.0f, -1.0f);
-    Vec3 horizontal(4.0f, 0.0f, 0.0f); // horizontal span
-    Vec3 vertical(0.0f, 2.0f, 0.0f); // vertical span
-    Vec3 origin = Vec3::zero;
-
-    // TODO: See later for using vectors instead
-    // std::vector<Hitable*> hitables = {
-    //     new Sphere{Vec3{0.0f, 0.0f, -1.0f}, 0.5f},
-    //     new Sphere{Vec3{0.0f, -100.5f, -1.0f}, 100.0f}
-    // };
-
     Hitable* hitables[2];
-    hitables[0] = new Sphere{Vec3{0.0f, 0.0f, -1.0f}, 0.5f};
-    hitables[1] = new Sphere{Vec3{0.0f, -100.5f, -1.0f}, 100.0f};
-    Hitable* world = new HitableList{hitables, 2};
+    hitables[0] = new Sphere(Vec3(0.0f, 0.0f, -1.0f), 0.5f);
+    hitables[1] = new Sphere(Vec3(0.0f, -100.5f, -1.0f), 100.0f);
+    Hitable* world = new HitableList(hitables, 2);
 
+    Camera cam;
+    
     for (int y = height - 1; y >= 0; y--) {
         for (int x = 0; x < width; x++) {
-            float u = float(x) / float(width);
-            float v = float(y) / float(height);
-
-            // Cast ray through each pixel in image plane
-            Ray r(origin, lower_left_corner + u * horizontal + v * vertical);
-        
-            // Vec3 p = r.point_at_parameter(2.0f);
-            Vec3 col = color(r, world);
+            Vec3 col = Vec3::zero;
+            for (int s = 0; s < sampleCount; ++s) {
+                float u = float(x + dis(gen)) / float(width);
+                float v = float(y + dis(gen)) / float(height);
+                Ray r = cam.get_ray(u, v);
+                //Vec3 p = r.point_at_parameter(2.0f);
+                col += color(r, world);
+            }
+            col /= float(sampleCount);
             int ir = int(255.99 * col.x());
             int ig = int(255.99 * col.y());
             int ib = int(255.99 * col.z());

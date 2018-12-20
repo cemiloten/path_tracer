@@ -6,7 +6,7 @@
         {
             "label": "Run path tracer",
             "type": "shell",
-            "command": "build/path_tracer.exe",
+            "command": "build/path_tracer && open output.ppm",
             "windows": {
                 "command": ".\\build\\path_tracer.exe && \"C:\\Program Files (x86)\\XnView\\xnview.exe\" output.ppm",
             },
