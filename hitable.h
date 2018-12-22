@@ -1,5 +1,5 @@
-#ifndef HITABLE_H
-#define HITABLE_H
+#ifndef path_tracer_hitable_h
+#define path_tracer_hitable_h
 
 #include "ray.h"
 

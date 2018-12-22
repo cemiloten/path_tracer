@@ -1,5 +1,5 @@
-#ifndef HITABLE_LIST_H
-#define HITABLE_LIST_H
+#ifndef path_tracer_hitable_list_h
+#define path_tracer_hitable_list_h
 
 #include "hitable.h"
 
@@ -7,13 +7,16 @@ class HitableList: public Hitable {
 public:
     HitableList() {}
     HitableList(Hitable** l, int n) : list(l), list_size(n) {}
-    virtual bool hit(const Ray& r, float t_min, float t_max, HitRecord& record) const;
+    virtual bool hit(
+        const Ray& r, float t_min, float t_max, HitRecord& record) const;
 
     Hitable** list;
     int list_size;
 };
 
-bool HitableList::hit(const Ray& r, float t_min, float t_max, HitRecord& record) const {
+bool HitableList::hit(
+    const Ray& r, float t_min, float t_max, HitRecord& record) const
+{
     HitRecord temp_rec;
     bool hit_anything = false;
     float closest_so_far = t_max;

@@ -1,5 +1,5 @@
-#ifndef VEC3_H
-#define VEC3_H
+#ifndef path_tracer_vec3_h
+#define path_tracer_vec3_h
 
 #include <math.h>
 #include <stdlib.h>
@@ -7,11 +7,6 @@
 
 class Vec3 {
 public:
-    static const Vec3 zero;
-    static const Vec3 one;
-
-    float e[3];
-
     Vec3() { e[0] = e[1] = e[2] = 0.0f; }
     Vec3(float f) { e[0] = e[1] = e[2] = f; }
     Vec3(float e0, float e1, float e2) { e[0] = e0; e[1] = e1; e[2] = e2; }
@@ -49,11 +44,15 @@ public:
         *this *= k;
     }
 
-    // inline Vec3 normalized() {
-    //     float k = 1.0f / length();
-    //     float x = e[0] * k;
-    //     return Vec3(x, e[1] * k, e[2] * k);
-    // }
+     inline Vec3 normalized() {
+         float k = 1.0f / length();
+         return Vec3(e[0] * k, e[1] * k, e[2] * k);
+     }
+    
+    static const Vec3 zero;
+    static const Vec3 one;
+
+    float e[3];
 };
 
 const Vec3 Vec3::zero = Vec3(0.0f);

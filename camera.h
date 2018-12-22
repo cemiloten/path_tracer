@@ -1,5 +1,5 @@
-#ifndef camera_h
-#define camera_h
+#ifndef path_tracer_camera_h
+#define path_tracer_camera_h
 
 #include "ray.h"
 
