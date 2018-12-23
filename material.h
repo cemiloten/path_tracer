@@ -63,27 +63,39 @@ public:
         Ray& scattered) const
     {
         Vec3 outward_normal;
-        float ni_over_nt;
-        attenuation = Vec3(1.0f, 1.0f, 0.0f);
+        float eta; // greek letter η -> η2/η1
+        attenuation = Vec3(1.0f, 1.0f, 1.0f);
+        Vec3 reflected = reflect(r_in.direction, record.normal);
         Vec3 refracted;
+        float reflect_prob;
+        float cosine;
+        float in_dot_n = dot(r_in.direction, record.normal);
     
         if (dot(r_in.direction, record.normal) > 0.0f) {
             outward_normal = -record.normal;
-            ni_over_nt = ior;
+            eta = ior;
+            cosine = ior * in_dot_n / r_in.direction.length();
         }
         else {
             outward_normal = record.normal;
-            ni_over_nt = 1.0f / ior;
+            eta = 1.0f / ior;
+            cosine = -in_dot_n / r_in.direction.length();
         }
     
-        // Choose between reflection and refraction.
-        if (refract(r_in.direction, outward_normal, ni_over_nt, refracted)) {
-            scattered = Ray(record.p, refracted);
+        if (refract(r_in.direction, outward_normal, eta, refracted)) {
+            reflect_prob = schlick(cosine, ior);
         }
         else {
-            scattered = Ray(record.p, reflect(r_in.direction, record.normal));
-            return false;
+            reflect_prob = 1.0f;
         }
+    
+        if (dis(gen) < reflect_prob) {
+            scattered = Ray(record.p, reflected);
+        }
+        else {
+            scattered = Ray(record.p, refracted);
+        }
+    
         return true;
     }
     

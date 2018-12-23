@@ -41,26 +41,37 @@ int main()
     out_file << "P3\n" << width << " " << height << "\n255\n";
 
     // Objects
-    Hitable* hitables[4];
+    Hitable* hitables[5];
     
     hitables[0] = new Sphere(
         Vec3( 0.0f, 0.0f, -1.0f), 0.5f,
-        new Lambertian(Vec3(0.8f, 0.3f, 0.3f)));
-    
+        new Lambertian(Vec3(0.1f, 0.2f, 0.5f)));
+
     hitables[1] = new Sphere(
-        Vec3( 1.0f, 0.0f, -1.0f), 0.5f,
-        new Metal(Vec3(0.8f, 0.6f, 0.2f), 0.3f));
-    
-    hitables[2] = new Sphere(
-        Vec3(-1.0f, 0.0f, -1.0f), 0.5f,
-        new Metal(Vec3(0.8f, 0.8f, 0.8f), 0.8f));
-    
-    hitables[3] = new Sphere(
         Vec3( 0.0f, -100.5f, -1.0f), 100.0f,
         new Lambertian(Vec3(0.8f, 0.8f, 0.0f)));
+
+    hitables[2] = new Sphere(
+        Vec3( 1.0f, 0.0f, -1.0f), 0.5f,
+        new Metal(Vec3(0.8f, 0.6f, 0.2f), 0.3f));
+
+    hitables[3] = new Sphere(
+        Vec3(-1.0f, 0.0f, -1.0f), 0.5f,
+        new Dielectric(1.5f));
+
+    hitables[4] = new Sphere(
+        Vec3(-1.0f, 0.0f, -1.0f), -0.45,
+        new Dielectric(1.5f));
     
-    Hitable* world = new HitableList(hitables, 4);
-    Camera cam;
+    Hitable* world = new HitableList(hitables, 5);
+    
+    Vec3 look_from(3, 3, 2);
+    Vec3 look_at(0, 0, -1);
+    float dist_to_focus = (look_from - look_at).length();
+    Camera cam(
+        look_from, look_at, Vec3(0, 1, 0),
+        20.0f, float(width) / float(height),
+        2.0f, dist_to_focus);
     
     for (int y = height - 1; y >= 0; y--) {
         for (int x = 0; x < width; x++) {
