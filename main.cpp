@@ -13,15 +13,18 @@ Vec3 color(const Ray& r, Hitable* world, int depth)
     if (world->hit(r, 0.001f, std::numeric_limits<float>::max(), record)) {
         Ray scattered;
         Vec3 attenuation;
+        Vec3 emitted = record.material->emitted(record.u, record.v, record.p);
         if (depth < 50
             && record.material->scatter(r, record, attenuation, scattered))
         {
-            return attenuation * color(scattered, world, depth + 1);
+            return emitted + attenuation * color(scattered, world, depth + 1);
         }
         else {
-            return Vec3::zero;
+            return emitted;
         }
     }
+    
+    return Vec3::zero;
 
     // Return sky color if no hit.
     Vec3 unit_direction = unit_vector(r.direction);
@@ -32,58 +35,54 @@ Vec3 color(const Ray& r, Hitable* world, int depth)
 int main()
 {
     // Screen size
-    int width = 200;
-    int height = 100;
-    int sampleCount = 50;
+    int width = 400;
+    int height = 400;
+    int samplePerPixel = 128;
 
     // IO
     std::ofstream out_file("output.ppm");
     out_file << "P3\n" << width << " " << height << "\n255\n";
 
+    Hitable* list[4];
+    list[0] = new Sphere(
+        Vec3(0, -1000, 0), 1000,
+        new Lambertian(new CheckerTexture(
+            new ConstantTexture(Vec3(0.2)),
+            new ConstantTexture(Vec3(0.8)))));
+    list[1] = new Sphere(
+        Vec3(-1, 1, 1), 0.2,
+        new Lambertian(new ConstantTexture(Vec3(0.2, 0.4, 0.8))));
+    list[2] = new Sphere(
+        Vec3(1, 1, 1), 0.5,
+        new Lambertian(new ConstantTexture(Vec3(1.0, 0.5, 0.1))));
+    list[3] = new Sphere(
+        Vec3(0, 3, 2), 1,
+        new DiffuseLight(new ConstantTexture(Vec3((1.0f)))));
+    
     // Objects
-    Hitable* hitables[5];
+    Hitable* world = new HitableList(list, sizeof(list) / sizeof(Hitable*));
     
-    hitables[0] = new Sphere(
-        Vec3( 0.0f, 0.0f, -1.0f), 0.5f,
-        new Lambertian(Vec3(0.1f, 0.2f, 0.5f)));
-
-    hitables[1] = new Sphere(
-        Vec3( 0.0f, -100.5f, -1.0f), 100.0f,
-        new Lambertian(Vec3(0.8f, 0.8f, 0.0f)));
-
-    hitables[2] = new Sphere(
-        Vec3( 1.0f, 0.0f, -1.0f), 0.5f,
-        new Metal(Vec3(0.8f, 0.6f, 0.2f), 0.3f));
-
-    hitables[3] = new Sphere(
-        Vec3(-1.0f, 0.0f, -1.0f), 0.5f,
-        new Dielectric(1.5f));
-
-    hitables[4] = new Sphere(
-        Vec3(-1.0f, 0.0f, -1.0f), -0.45,
-        new Dielectric(1.5f));
+    Vec3 look_from(2, 2, 5);
+    Vec3 look_at(
+        (reinterpret_cast<Sphere*>(list[1])->center
+        + reinterpret_cast<Sphere*>(list[2])->center) / 2);
     
-    Hitable* world = new HitableList(hitables, 5);
-    
-    Vec3 look_from(3, 3, 2);
-    Vec3 look_at(0, 0, -1);
     float dist_to_focus = (look_from - look_at).length();
     Camera cam(
         look_from, look_at, Vec3(0, 1, 0),
-        20.0f, float(width) / float(height),
-        2.0f, dist_to_focus);
+        45.0f, float(width) / float(height),
+        0.15f, dist_to_focus);
     
     for (int y = height - 1; y >= 0; y--) {
         for (int x = 0; x < width; x++) {
             Vec3 col = Vec3::zero;
-            for (int s = 0; s < sampleCount; ++s) {
+            for (int s = 0; s < samplePerPixel; ++s) {
                 float u = float(x + dis(gen)) / float(width);
                 float v = float(y + dis(gen)) / float(height);
                 Ray r = cam.get_ray(u, v);
-                //Vec3 p = r.point_at_parameter(2.0f);
                 col += color(r, world, 0);
             }
-            col /= float(sampleCount);
+            col /= float(samplePerPixel);
 
             // Approximate gamma correction (~2.0)
             col = Vec3(sqrt(col.r()), sqrt(col.g()), sqrt(col.b()));

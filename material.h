@@ -3,6 +3,7 @@
 
 #include "hitable.h"
 #include "helpers.h"
+#include "texture.h"
 
 class Material {
 public:
@@ -11,11 +12,16 @@ public:
         const HitRecord& record,
         Vec3& attenuation,
         Ray& scattered) const = 0;
+    
+    virtual Vec3 emitted(float u, float v, Vec3& p) const {
+        return Vec3::zero;
+    }
 };
+
 
 class Lambertian : public Material {
 public:
-    Lambertian(const Vec3& a) : albedo(a) {}
+    Lambertian(Texture* tex) : albedo(tex) {}
     
     virtual bool scatter(
         const Ray& r_in,
@@ -25,12 +31,13 @@ public:
     {
         Vec3 target = record.p + record.normal + random_in_unit_sphere();
         scattered = Ray(record.p, target - record.p);
-        attenuation = albedo;
+        attenuation = albedo->value(0, 0, record.p);
         return true;
     }
     
-    Vec3 albedo;
+    Texture* albedo;
 };
+
 
 class Metal : public Material {
 public:
@@ -51,6 +58,7 @@ public:
     Vec3 albedo;
     float fuzz;
 };
+
 
 class Dielectric : public Material {
 public:
@@ -99,8 +107,28 @@ public:
         return true;
     }
     
-    
     float ior;
+};
+
+
+class DiffuseLight : public Material {
+public:
+    DiffuseLight(Texture* tex) : emit(tex) {}
+
+    virtual bool scatter(
+        const Ray& r_in,
+        const HitRecord& record,
+        Vec3& attenuation,
+        Ray& scattered) const
+    {
+        return false;
+    }
+    
+    virtual Vec3 emitted(float u, float v, Vec3& p) const {
+        return emit->value(u, v, p);
+    }
+    
+    Texture* emit;
 };
 
 #endif
