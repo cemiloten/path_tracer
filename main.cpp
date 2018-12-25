@@ -6,6 +6,7 @@
 #include "hitable_list.h"
 #include "camera.h"
 #include "material.h"
+#include "xy_rect.h"
 
 Vec3 color(const Ray& r, Hitable* world, int depth)
 {
@@ -32,40 +33,58 @@ Vec3 color(const Ray& r, Hitable* world, int depth)
     return (1.0f - t) * Vec3::one + t * Vec3(0.5f, 0.7f, 1.0f);
 }
 
+// TODO:
+// triangles
+// area lights
+// render in real time instead of ppm
+//
+
 int main()
 {
     // Screen size
-    int width = 400;
+    int width = 600;
     int height = 400;
-    int samplePerPixel = 128;
+    int samplePerPixel = 1024;
 
     // IO
     std::ofstream out_file("output.ppm");
     out_file << "P3\n" << width << " " << height << "\n255\n";
 
-    Hitable* list[4];
+    Hitable* list[6];
     list[0] = new Sphere(
         Vec3(0, -1000, 0), 1000,
         new Lambertian(new CheckerTexture(
             new ConstantTexture(Vec3(0.2)),
             new ConstantTexture(Vec3(0.8)))));
     list[1] = new Sphere(
-        Vec3(-1, 1, 1), 0.2,
-        new Lambertian(new ConstantTexture(Vec3(0.2, 0.4, 0.8))));
+        Vec3(0, 3, 3), 1,
+        new DiffuseLight(new ConstantTexture(0.7f)));
+    
     list[2] = new Sphere(
-        Vec3(1, 1, 1), 0.5,
+        Vec3(0, 2, 0), 2,
         new Lambertian(new ConstantTexture(Vec3(1.0, 0.5, 0.1))));
-    list[3] = new Sphere(
-        Vec3(0, 3, 2), 1,
-        new DiffuseLight(new ConstantTexture(Vec3((1.0f)))));
+    
+    list[3] = new XYRect(
+        3, 5, 1, 3, -2, new DiffuseLight(new ConstantTexture(1.0f)));
+    
+    list[4] = new Sphere(
+        Vec3(5, 1.1, 0), 1,
+        new Metal(new ConstantTexture(Vec3(0, 3, 8)), 0.7));
+    
+    list[5] = new Sphere(
+        Vec3(3, 7, 2),
+        2,
+        new DiffuseLight(new ConstantTexture(1.0f)));
     
     // Objects
     Hitable* world = new HitableList(list, sizeof(list) / sizeof(Hitable*));
     
-    Vec3 look_from(2, 2, 5);
-    Vec3 look_at(
-        (reinterpret_cast<Sphere*>(list[1])->center
-        + reinterpret_cast<Sphere*>(list[2])->center) / 2);
+    Vec3 look_from(10, 2, 4);
+//    Vec3 look_at(
+//        (reinterpret_cast<Sphere*>(list[1])->center
+//        + reinterpret_cast<Sphere*>(list[2])->center) / 2);
+    
+    Vec3 look_at(0, 1, -0.5);
     
     float dist_to_focus = (look_from - look_at).length();
     Camera cam(

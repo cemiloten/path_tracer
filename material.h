@@ -21,6 +21,8 @@ public:
 
 class Lambertian : public Material {
 public:
+    Texture* albedo;
+    
     Lambertian(Texture* tex) : albedo(tex) {}
     
     virtual bool scatter(
@@ -34,14 +36,17 @@ public:
         attenuation = albedo->value(0, 0, record.p);
         return true;
     }
-    
-    Texture* albedo;
 };
 
 
 class Metal : public Material {
 public:
-    Metal(const Vec3& a, float f) : albedo(a) { fuzz = f < 1.0f ? f : 1.0f; }
+    Texture* albedo;
+    float fuzz;
+    
+    Metal(Texture* tex, float f) : albedo(tex) {
+        fuzz = f < 1.0f ? f : 1.0f;
+    }
     
     virtual bool scatter(
         const Ray& r_in,
@@ -51,17 +56,16 @@ public:
     {
         Vec3 reflected = reflect(unit_vector(r_in.direction), record.normal);
         scattered = Ray(record.p, reflected + fuzz * random_in_unit_sphere());
-        attenuation = albedo;
+        attenuation = albedo->value(0, 0, record.p);
         return dot(scattered.direction, record.normal) > 0.0f;
     }
-    
-    Vec3 albedo;
-    float fuzz;
 };
 
 
 class Dielectric : public Material {
 public:
+    float ior;
+
     Dielectric(float index_of_refraction) : ior(index_of_refraction) {}
 
     virtual bool scatter(
@@ -106,13 +110,13 @@ public:
     
         return true;
     }
-    
-    float ior;
 };
 
 
 class DiffuseLight : public Material {
 public:
+    Texture* emit;
+    
     DiffuseLight(Texture* tex) : emit(tex) {}
 
     virtual bool scatter(
@@ -127,8 +131,6 @@ public:
     virtual Vec3 emitted(float u, float v, Vec3& p) const {
         return emit->value(u, v, p);
     }
-    
-    Texture* emit;
 };
 
 #endif

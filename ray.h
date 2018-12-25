@@ -5,12 +5,15 @@
 
 class Ray {
 public:
-    Ray() {}
-    Ray(const Vec3& o, const Vec3& d) : origin(o), direction(d) {}
-    Vec3 point_at_parameter(float t) const { return origin + t * direction; }
-    
     Vec3 origin;
     Vec3 direction;
+    
+    Ray() {}
+    Ray(const Vec3& o, const Vec3& d) : origin(o), direction(d) {}
+
+    Vec3 point_at_parameter(float t) const {
+        return origin + t * direction;
+    }
 };
 
 #endif

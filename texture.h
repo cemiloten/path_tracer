@@ -9,14 +9,14 @@ public:
 
 class ConstantTexture : public Texture {
 public:
+    Vec3 color;
+
     ConstantTexture() {}
     ConstantTexture(Vec3 c) : color(c) {}
     
     virtual Vec3 value(float u, float v, const Vec3& p) const {
         return color;
     }
-    
-    Vec3 color;
 };
 
 

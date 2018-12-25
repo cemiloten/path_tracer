@@ -5,6 +5,15 @@
 
 class Camera {
 public:
+    Vec3 origin;
+    Vec3 lower_left_corner;
+    Vec3 horizontal;
+    Vec3 vertical;
+    Vec3 u;
+    Vec3 v;
+    Vec3 w;
+    float lens_radius;
+    
     Camera(
         Vec3 look_from, Vec3 look_at, Vec3 view_up,
         float v_fov_in_degrees, float aspect_ratio,
@@ -35,17 +44,6 @@ public:
             origin + offset,
             lower_left_corner + img_plane_pos - origin - offset);
     }
-    
-    Vec3 origin;
-    Vec3 lower_left_corner;
-    Vec3 horizontal;
-    Vec3 vertical;
-    
-    Vec3 u;
-    Vec3 v;
-    Vec3 w;
-    
-    float lens_radius;
 };
 
 #endif

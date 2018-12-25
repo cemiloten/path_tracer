@@ -6,15 +6,14 @@
 
 class Sphere: public Hitable {
 public:
-    Sphere() {}
-    Sphere(Vec3 c, float r, Material* m) : center(c), radius(r), material(m) {};
-    
-    virtual bool hit(
-        const Ray& r, float t_min, float t_max, HitRecord& rec) const;
-    
     Vec3 center;
     float radius;
     Material* material;
+    
+    Sphere() {}
+    Sphere(Vec3 c, float r, Material* m) : center(c), radius(r), material(m) {}
+    virtual bool hit(
+        const Ray& r, float t_min, float t_max, HitRecord& rec) const;
 };
 
 bool Sphere::hit(
