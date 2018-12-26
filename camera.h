@@ -36,7 +36,7 @@ public:
         vertical = 2.0f * half_height * focus_distance * v;
     }
     
-    Ray get_ray(float s, float t) {
+    Ray get_ray(float s, float t) const {
         Vec3 rnd = lens_radius * random_in_unit_disk();
         Vec3 offset = u * rnd.x() + v * rnd.y();
         Vec3 img_plane_pos = s * horizontal + t * vertical;

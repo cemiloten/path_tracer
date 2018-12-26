@@ -1,6 +1,7 @@
 #ifndef path_tracer_vec3_h
 #define path_tracer_vec3_h
 
+#define _USE_MATH_DEFINES
 #include <math.h>
 #include <stdlib.h>
 #include <iostream>
@@ -58,13 +59,13 @@ public:
 const Vec3 Vec3::zero = Vec3(0.0f);
 const Vec3 Vec3::one = Vec3(1.0f);
 
-inline std::istream& operator >> (std::istream &is, Vec3 &t) {
-    is >> t.e[0] >> t.e[1] >> t.e[2];
+inline std::istream& operator >> (std::istream& is, Vec3& v) {
+    is >> v.e[0] >> v.e[1] >> v.e[2];
     return is;
 }
 
-inline std::ostream& operator << (std::ostream &os, const Vec3 &t) {
-    os << t.e[0] << " " << t.e[1] << " " << t.e[2];
+inline std::ostream& operator << (std::ostream& os, const Vec3& v) {
+    os << "(" << v.e[0] << ", " << v.e[1] << ", " << v.e[2] << ")";
     return os;
 }
 
