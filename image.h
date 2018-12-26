@@ -13,7 +13,7 @@ public:
         data = std::vector<Vec3>(width * height, Vec3(0.95f, 0.6f, 0.2f));
     }
 
-    friend inline std::ostream& operator << (std::ostream& out_stream, const Image& img);
+    friend inline std::ostream& operator<< (std::ostream& os, const Image& img);
 
     bool set_pixel(int x, int y, Vec3 color) {
         if (color.r() < 0.0f
@@ -52,14 +52,14 @@ private:
     std::vector<Vec3> data;
 };
 
-inline std::ostream& operator << (std::ostream& out_stream, const Image& img) {
+inline std::ostream& operator<< (std::ostream& os, const Image& img) {
     for (int y = 0; y < img.height; ++y) {
         for (int x = 0; x < img.width; ++x) {
-            out_stream << img.data[x + y * img.width] << " ";
+            os << img.data[x + y * img.width] << " ";
         }
-        out_stream << "\n";
+        os << "\n";
     }
-    return out_stream;
+    return os;
 }
 
 #endif
