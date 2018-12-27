@@ -11,6 +11,7 @@
 #include "path_tracer/xy_rect.h"
 #include "path_tracer/image.h"
 #include "path_tracer/thread_pool.h"
+#include "path_tracer/sampler.h"
 
 Vec3 color(const Ray& r, const Hitable* world, int depth)
 {
@@ -39,6 +40,7 @@ Vec3 color(const Ray& r, const Hitable* world, int depth)
 
 
 // TODO:
+// sampling
 // image
 // multithreading
 // triangles
@@ -48,7 +50,6 @@ int main()
     // Screen size
     int width = 600;
     int height = 400;
-    int spp = 32;
 
     Hitable* list[6];
     list[0] = new Sphere(
@@ -91,11 +92,19 @@ int main()
     Image image(width, height);
     auto start = std::chrono::high_resolution_clock::now();
     
-//    std::mutex critical;
+    int spp = 64;
     ThreadPool::ParallelFor(0, height, [&](int y) {
-//        std::lock_guard<std::mutex> lock(critical);
         for (int x = 0; x < width; x++) {
             Vec3 col;
+            Sampler2D sampler(8);
+            sampler.generate();
+            
+             //// one ray per pixel.
+             //double u = double(x) / double(width);
+             //double v = double(y) / double(height);
+             //Ray r = cam.get_ray(u, v);
+             //col += color(r, world, 0);
+
             for (int s = 0; s < spp; ++s) {
                 double u = double(x + dis(gen)) / double(width);
                 double v = double(y + dis(gen)) / double(height);
@@ -103,6 +112,16 @@ int main()
                 col += color(r, world, 0);
             }
             col /= double(spp);
+
+            // multi jittered
+            //for (int s = 0; s < sampler.n_samples; ++s) {
+            //    Ray r = cam.get_ray(
+            //        (x + sampler.samples[s].x) / double(width),
+            //        (y + sampler.samples[s].y) / double(height));
+            //    col += color(r, world, 0);
+            //}
+            //col /= double(sampler.n_samples);
+
 
             // Approximate gamma correction (~2.0)
             col = Vec3(sqrt(col.r), sqrt(col.g), sqrt(col.b));
