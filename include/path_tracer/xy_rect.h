@@ -1,35 +1,35 @@
 #ifndef path_tracer_xy_rect_h
 #define path_tracer_xy_rect_h
 
-#include "hitable.h"
-#include "material.h"
+#include "path_tracer/hitable.h"
+#include "path_tracer/material.h"
 
 class XYRect : public Hitable {
 public:
-    float x0;
-    float x1;
-    float y0;
-    float y1;
-    float k;
+    double x0;
+    double x1;
+    double y0;
+    double y1;
+    double k;
     Material* material;
     
     XYRect() {}
-    XYRect(float _x0, float _x1, float _y0, float _y1, float _k, Material* mat)
+    XYRect(double _x0, double _x1, double _y0, double _y1, double _k, Material* mat)
         : x0(_x0), x1(_x1), y0(_y0), y1(_y1), k(_k), material(mat) {}
     
     virtual bool hit(
-        const Ray& r, float t_min, float t_max, HitRecord& record) const;
+        const Ray& r, double t_min, double t_max, HitRecord& record) const;
 };
 
 bool XYRect::hit(
-    const Ray& r, float t_min, float t_max, HitRecord& record) const
+    const Ray& r, double t_min, double t_max, HitRecord& record) const
 {
-    float t = (k - r.origin.z()) / r.direction.z();
+    double t = (k - r.origin.z) / r.direction.z;
     if (t < t_min || t > t_max) {
         return false;
     }
-    float x = r.origin.x() + t * r.direction.x();
-    float y = r.origin.y() + t * r.direction.y();
+    double x = r.origin.x + t * r.direction.x;
+    double y = r.origin.y + t * r.direction.y;
     if (x < x0 || x > x1 || y < y0 || y > y1) {
         return false;
     }

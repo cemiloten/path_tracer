@@ -1,5 +1,5 @@
-#ifndef thread_pool_h
-#define thread_pool_h
+#ifndef path_tracer_thread_pool_h
+#define path_tracer_thread_pool_h
 
 #include <iostream>
 #include <vector>
@@ -56,4 +56,4 @@ public:
     }
 };
 
-#endif /* thread_pool_h */
+#endif

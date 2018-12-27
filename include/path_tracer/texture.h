@@ -3,7 +3,7 @@
 
 class Texture {
 public:
-    virtual Vec3 value(float u, float v, const Vec3& p) const = 0;
+    virtual Vec3 value(double u, double v, const Vec3& p) const = 0;
 };
 
 
@@ -14,7 +14,7 @@ public:
     ConstantTexture() {}
     ConstantTexture(Vec3 c) : color(c) {}
     
-    virtual Vec3 value(float u, float v, const Vec3& p) const {
+    virtual Vec3 value(double u, double v, const Vec3& p) const {
         return color;
     }
 };
@@ -25,9 +25,9 @@ public:
     CheckerTexture() {}
     CheckerTexture(Texture* t0, Texture* t1) : even(t0), odd(t1) {}
     
-    virtual Vec3 value(float u, float v, const Vec3& p) const {
-        float t = 10.0f;
-        float sines = sin(sin(t * p.x()) * sin(t * p.y()) * sin(t * p.z()));
+    virtual Vec3 value(double u, double v, const Vec3& p) const {
+        double t = 10.0;
+        double sines = sin(sin(t * p.x) * sin(t * p.y) * sin(t * p.z));
         
         if (sines > 0) {
             return odd->value(u, v, p);

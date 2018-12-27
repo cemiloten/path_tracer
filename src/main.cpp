@@ -4,18 +4,18 @@
 #include <chrono>
 #include <thread>
 
-#include "sphere.h"
-#include "hitable_list.h"
-#include "camera.h"
-#include "material.h"
-#include "xy_rect.h"
-#include "image.h"
-#include "thread_pool.h"
+#include "path_tracer/sphere.h"
+#include "path_tracer/hitable_list.h"
+#include "path_tracer/camera.h"
+#include "path_tracer/material.h"
+#include "path_tracer/xy_rect.h"
+#include "path_tracer/image.h"
+#include "path_tracer/thread_pool.h"
 
 Vec3 color(const Ray& r, const Hitable* world, int depth)
 {
     HitRecord record;
-    if (world->hit(r, 0.001f, std::numeric_limits<float>::max(), record)) {
+    if (world->hit(r, 0.001, std::numeric_limits<double>::max(), record)) {
         Ray scattered;
         Vec3 attenuation;
         Vec3 emitted = record.material->emitted(record.u, record.v, record.p);
@@ -33,8 +33,8 @@ Vec3 color(const Ray& r, const Hitable* world, int depth)
 
     // Return sky color if no hit.
     Vec3 unit_direction = unit_vector(r.direction);
-    float t = 0.5f * (unit_direction.y() + 1.0f); // -1:1 to 0:1
-    return (1.0f - t) * Vec3::one + t * Vec3(0.5f, 0.7f, 1.0f);
+    double t = 0.5 * (unit_direction.y + 1.0); // -1:1 to 0:1
+    return (1.0 - t) * Vec3::one + t * Vec3(0.5, 0.7, 1.0);
 }
 
 
@@ -48,7 +48,7 @@ int main()
     // Screen size
     int width = 600;
     int height = 400;
-    int spp = 128;
+    int spp = 32;
 
     Hitable* list[6];
     list[0] = new Sphere(
@@ -59,53 +59,53 @@ int main()
     
     list[1] = new Sphere(
         Vec3(0, 3, 3), 1,
-        new DiffuseLight(new ConstantTexture(0.7f)));
+        new DiffuseLight(new ConstantTexture(0.7)));
     
     list[2] = new Sphere(
         Vec3(0, 2, 0), 2,
         new Lambertian(new ConstantTexture(Vec3(1.0, 0.5, 0.1))));
     
     list[3] = new XYRect(
-        3, 5, 1, 3, -2, new DiffuseLight(new ConstantTexture(1.0f)));
+        3, 5, 1, 3, -2, new DiffuseLight(new ConstantTexture(1.0)));
     
     list[4] = new Sphere(
-        Vec3(5, 1.1, 0), 1,
+        Vec3(5.0, 1.1, 0.0), 1,
         new Lambertian(new ConstantTexture(Vec3(0.2, 0.4, 0.8))));
     
     list[5] = new Sphere(
         Vec3(3, 7, 2), 2,
-        new DiffuseLight(new ConstantTexture(1.0f)));
+        new DiffuseLight(new ConstantTexture(1.0)));
     
     // Objects
     Hitable* world = new HitableList(list, sizeof(list) / sizeof(Hitable*));
     
     Vec3 look_from(10, 2, 4);
-    Vec3 look_at(0, 1, -0.5);
+    Vec3 look_at(0.0, 1.0, -0.5);
     
-    float dist_to_focus = (look_from - look_at).length();
+    double dist_to_focus = (look_from - look_at).length();
     Camera cam(
         look_from, look_at, Vec3(0, 1, 0),
-        45.0f, float(width) / float(height),
-        0.15f, dist_to_focus);
+        45.0, double(width) / double(height),
+        0.15, dist_to_focus);
     
     Image image(width, height);
     auto start = std::chrono::high_resolution_clock::now();
     
 //    std::mutex critical;
-    ThreadPool::SequentialFor(0, height, [&](int y) {
+    ThreadPool::ParallelFor(0, height, [&](int y) {
 //        std::lock_guard<std::mutex> lock(critical);
         for (int x = 0; x < width; x++) {
             Vec3 col;
             for (int s = 0; s < spp; ++s) {
-                float u = float(x + dis(gen)) / float(width);
-                float v = float(y + dis(gen)) / float(height);
+                double u = double(x + dis(gen)) / double(width);
+                double v = double(y + dis(gen)) / double(height);
                 Ray r = cam.get_ray(u, v);
                 col += color(r, world, 0);
             }
-            col /= float(spp);
+            col /= double(spp);
 
             // Approximate gamma correction (~2.0)
-            col = Vec3(sqrt(col.r()), sqrt(col.g()), sqrt(col.b()));
+            col = Vec3(sqrt(col.r), sqrt(col.g), sqrt(col.b));
             image.set_pixel(x, y, col);
         }
     });

@@ -1,7 +1,7 @@
 #ifndef path_tracer_triangle_h
 #define path_tracer_triangle_h
 
-#include "hitable.h"
+#include "path_tracer/hitable.h"
 
 class Triangle : public Hitable {
 public:

@@ -5,23 +5,23 @@
 #include <string>
 #include <iostream>
 
-#include "vec3.h"
+#include "path_tracer/vec3.h"
 
 class Image {
 public:
     Image(int w, int h) : width(w), height(h) {
-        data = std::vector<Vec3>(width * height, Vec3(0.95f, 0.6f, 0.2f));
+        data = std::vector<Vec3>(width * height, Vec3(0.95, 0.6, 0.2));
     }
 
     friend inline std::ostream& operator<< (std::ostream& os, const Image& img);
 
     bool set_pixel(int x, int y, Vec3 color) {
-        if (color.r() < 0.0f
-            || color.g() < 0.0f
-            || color.b() < 0.0f
-            || color.r() > 1.0f
-            || color.g() > 1.0f
-            || color.b() > 1.0f)
+        if (color.r < 0.0
+            || color.g < 0.0
+            || color.b < 0.0
+            || color.r > 1.0
+            || color.g > 1.0
+            || color.b > 1.0)
         {
             return false;
         }
@@ -37,9 +37,9 @@ public:
         for (int y = height - 1; y >= 0; --y) {
             for (int x = 0; x < width; ++x) {
                 Vec3 color = data[x + y * width];
-                int ir = int(255.99 * color.r());
-                int ig = int(255.99 * color.g());
-                int ib = int(255.99 * color.b());
+                int ir = int(255.99 * color.r);
+                int ig = int(255.99 * color.g);
+                int ib = int(255.99 * color.b);
                 out_file << ir << " " << ig << " " << ib << "\n";
             }
         }

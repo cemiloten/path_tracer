@@ -2,13 +2,22 @@ cmake_minimum_required(VERSION 3.0)
 
 project(path_tracer)
 
-if (NOT WIN32)
-    add_definitions(-std=c++0x)
-endif()
+# if (NOT WIN32)
+#     add_definitions(-std=c++0x)
+# endif()
 
-file(GLOB SOURCE_FILES
-    "*.h"
-    "*.cpp"
+include_directories(
+    # My include files
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
 
-add_executable(path_tracer ${SOURCE_FILES})
+file(GLOB PT_HEADERS
+    "include/path_tracer/*.h")
+
+file(GLOB PT_SOURCES
+    "src/*.cpp")
+
+add_executable(path_tracer
+    ${PT_HEADERS}
+    ${PT_SOURCES}
+)
