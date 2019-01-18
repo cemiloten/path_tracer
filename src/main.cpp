@@ -13,6 +13,7 @@
 #include "path_tracer/thread_pool.h"
 #include "path_tracer/sampler.h"
 
+
 Vec3 color(const Ray& r, const Hitable* world, int depth)
 {
     HitRecord record;

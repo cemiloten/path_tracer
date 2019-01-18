@@ -6,6 +6,8 @@ project(path_tracer)
 #     add_definitions(-std=c++0x)
 # endif()
 
+set( CMAKE_EXPORT_COMPILE_COMMANDS ON )
+
 include_directories(
     # My include files
     ${CMAKE_CURRENT_SOURCE_DIR}/include

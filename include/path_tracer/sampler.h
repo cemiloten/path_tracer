@@ -7,12 +7,8 @@
 #include "path_tracer/vec2.h"
 
 
-std::random_device rd2;
-std::mt19937 generate(rd2());
-std::uniform_real_distribution<double> distr(0.0, 1.0);
-
 double randf01() {
-    return distr(generate);
+    return distribution(generate);
 }
 
 class Sampler2D {
@@ -52,6 +48,11 @@ public:
             }
         }
     }
+    
+private:
+    std::random_device rnd;
+    std::mt19937 generate(rnd());
+    std::uniform_real_distribution<double> distribution(0.0, 1.0);
 };
 
 #endif
