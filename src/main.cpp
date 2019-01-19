@@ -17,6 +17,7 @@
 Vec3 color(const Ray& r, const Hitable* world, int depth)
 {
     HitRecord record;
+    /// test commment
     if (world->hit(r, 0.001, std::numeric_limits<double>::max(), record)) {
         Ray scattered;
         Vec3 attenuation;
