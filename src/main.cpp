@@ -49,7 +49,6 @@ Vec3 color(const Ray& r, const Hitable* world, int depth)
 // OpenGL
 int main()
 {
-    // Screen size
     int width = 600;
     int height = 400;
 
@@ -89,41 +88,27 @@ int main()
     Camera cam(
         look_from, look_at, Vec3(0, 1, 0),
         45.0, double(width) / double(height),
-        0.15, dist_to_focus);
+        0.0, dist_to_focus);
     
     Image image(width, height);
     auto start = std::chrono::high_resolution_clock::now();
     
     int spp = 64;
+    bool jittered = true;
+    std::string output_name;
+
     ThreadPool::ParallelFor(0, height, [&](int y) {
         for (int x = 0; x < width; x++) {
             Vec3 col;
-            Sampler2D sampler(8);
-            sampler.generate();
-            
-             //// one ray per pixel.
-             //double u = double(x) / double(width);
-             //double v = double(y) / double(height);
-             //Ray r = cam.get_ray(u, v);
-             //col += color(r, world, 0);
-
-            for (int s = 0; s < spp; ++s) {
-                double u = double(x + dis(gen)) / double(width);
-                double v = double(y + dis(gen)) / double(height);
-                Ray r = cam.get_ray(u, v);
+            Sampler2D sampler(8, 8);
+            output_name = "jittered_output2.ppm";
+            for (int s = 0; s < sampler.n_sample; ++s) {
+                Ray r = cam.get_ray(
+                    (x + sampler.samples[s].x) / double(width),
+                    (y + sampler.samples[s].y) / double(height));
                 col += color(r, world, 0);
             }
-            col /= double(spp);
-
-            // multi jittered
-            //for (int s = 0; s < sampler.n_samples; ++s) {
-            //    Ray r = cam.get_ray(
-            //        (x + sampler.samples[s].x) / double(width),
-            //        (y + sampler.samples[s].y) / double(height));
-            //    col += color(r, world, 0);
-            //}
-            //col /= double(sampler.n_samples);
-
+            col /= double(sampler.n_sample);
 
             // Approximate gamma correction (~2.0)
             col = Vec3(sqrt(col.r), sqrt(col.g), sqrt(col.b));
@@ -135,7 +120,7 @@ int main()
     std::chrono::duration<double> elapsed = end - start;
     std::cout << "Render time: " << elapsed.count() << " seconds\n";
 
-    image.save("output.ppm");
+    image.save(output_name);
 
     return 0;
 }

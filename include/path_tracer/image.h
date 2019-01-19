@@ -16,12 +16,8 @@ public:
     friend inline std::ostream& operator<< (std::ostream& os, const Image& img);
 
     bool set_pixel(int x, int y, Vec3 color) {
-        if (color.r < 0.0
-            || color.g < 0.0
-            || color.b < 0.0
-            || color.r > 1.0
-            || color.g > 1.0
-            || color.b > 1.0)
+        if (color.r < 0.0 || color.g < 0.0 || color.b < 0.0
+            || color.r > 1.0 || color.g > 1.0 || color.b > 1.0)
         {
             return false;
         }
